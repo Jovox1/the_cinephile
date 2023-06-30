@@ -31,6 +31,7 @@ import 'swiper/scss/navigation'
 import { usePopular } from '@/stores/popular'
 import { onMounted, ref, computed } from 'vue';
 import { imgUrl, imgUrlFull } from "@/static.js";
+import { useItemId } from "@/stores/itemId";
 
 
 const props = defineProps(['type'])
@@ -63,20 +64,23 @@ onMounted(() => {
     popular.getPopular({ type: props.type })
 })
 
+const itemIdStore = useItemId()
+
 let current = ref(null)
 let inf = ref(null)
 let open = ref(false)
 const getItem = async item => {
     current.value = null
-    current.value = item
+    await itemIdStore.getItemId({ type: props.type, id: item.id })
+    current.value = props.type == 'movie' ? itemIdStore.movie : itemIdStore.tv
     open.value = true
     let infTop = inf.value.offsetTop
     window.scrollTo({
         top: infTop - navHeight.offsetHeight,
         behavior: 'smooth'
     })
-
 }
+
 
 const close = () => {
     open.value = false
